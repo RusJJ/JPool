@@ -1,7 +1,7 @@
 #ifndef _JPOOL_H
 #define _JPOOL_H
 
-// A simple Pool which allows us to give a simple pointer to a slot item
+// A simple Pool which gives us a simple pointer to a slot item
 template <typename A>
 class JPoolDefault
 {
@@ -40,13 +40,7 @@ public:
         int index = GetIndex(obj);
         if(index != -1) this->occupied[index] = false;
     }
-    inline void RemoveAt(int slot)
-    {
-        if(slot < size)
-        {
-            this->occupied[slot] = false;
-        }
-    }
+    inline void RemoveAt(int slot)       { if(slot < size) this->occupied[slot] = false; }
     inline A*   GetAt(int slot)          { return (this->occupied[slot] == true) ? &this->data[slot] : NULL; }
     inline bool IsSlotOccupied(int slot) { return this->occupied[slot]; }
     inline int  GetSize()                { return this->size; }
@@ -61,7 +55,7 @@ protected:
 
 
 
-// Still a simple Pool which allows us to give a simple pointer to a slot item
+// Still a simple Pool gives us a simple pointer to a slot item
 // but also calculates first free slot which allows us to use Alloc()
 template <typename A>
 class JPoolCalcFree : public JPoolDefault<A>
@@ -125,7 +119,7 @@ protected:
 
 
 
-// Still a simple Pool which allows us to give a simple pointer to a slot item
+// Still a simple Pool gives us a simple pointer to a slot item
 // but also calculates the highest slot ever used (for optimization purposes)
 template <typename A>
 class JPoolCalcHighest : public JPoolDefault<A>
@@ -155,7 +149,7 @@ protected:
 
 
 
-// Still a simple Pool which allows us to give a simple pointer to a slot item
+// Still a simple Pool gives us a simple pointer to a slot item
 // but also calculates the highest slot ever used and first free slot
 template <typename A>
 class JPoolCalcFreeHighest : public JPoolCalcFree<A>
