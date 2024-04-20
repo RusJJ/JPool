@@ -1,6 +1,8 @@
 #ifndef _JPOOL_H
 #define _JPOOL_H
 
+#include <stddef.h> // declare NULL
+
 // A simple Pool which gives us a simple pointer to a slot item
 template <typename A>
 class JPoolDefault
