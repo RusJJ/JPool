@@ -144,6 +144,18 @@ public:
         return &this->data[slot];
     }
     inline int GetHighestSlotUsedEver() { return this->highestSlotUsedEver; }
+    inline void RefreshHighestSlot()
+    {
+        for(int i = this->highestSlotUsedEver; i >= 0; --i)
+        {
+            if(this->occupied[i])
+            {
+                this->highestSlotUsedEver = i;
+                return;
+            }
+        }
+        this->highestSlotUsedEver = 0;
+    }
 
 protected:
     int highestSlotUsedEver;
