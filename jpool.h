@@ -19,21 +19,23 @@ public:
         this->data = new A[itemsCount];
         this->occupied = new bool[itemsCount];
         this->size = itemsCount;
-        for(int i = 0; i < itemsCount; ++i) this->occupied[i] = false;
+        memset(this->occupied, 0, itemsCount);
     }
     ~JPoolDefault()
     {
-        delete this->data;
-        delete this->occupied;
+        if(this->data) delete this->data;
+        if(this->occupied) delete this->occupied;
+        this->data = NULL;
+        this->occupied = NULL;
     }
     inline int GetIndex(A* obj)
     {
         int index = obj - this->data;
-        return (index < 0 || index >= size) ? -1 : index;
+        return (IsValidSlot(index)) ? index : -1;
     }
     inline A* AllocAt(int slot, bool reoccupy = false)
     {
-        if(slot < 0 || slot >= size) return NULL;
+        if(!IsValidSlot(slot)) return NULL;
         if(reoccupy == false && this->occupied[slot] == true) return NULL;
         this->occupied[slot] = true;
         return &this->data[slot];
@@ -43,9 +45,11 @@ public:
         int index = GetIndex(obj);
         if(index != -1) this->occupied[index] = false;
     }
-    inline void RemoveAt(int slot)       { if(slot >= 0 && slot < size) this->occupied[slot] = false; }
-    inline A*   GetAt(int slot)          { return (slot >= 0 && slot < size && this->occupied[slot] == true) ? &this->data[slot] : NULL; }
-    inline bool IsSlotOccupied(int slot) { return this->occupied[slot]; }
+    inline void RemoveAt(int slot)       { if(IsValidSlot(slot)) this->occupied[slot] = false; }
+    inline A*   GetAt(int slot)          { return (IsValidSlot(slot) && this->occupied[slot]) ? &this->data[slot] : NULL; }
+    inline A*   GetAtFast(int slot)      { return (this->occupied[slot]) ? &this->data[slot] : NULL; }
+    inline bool IsSlotOccupied(int slot) { return (!IsValidSlot(slot) || this->occupied[slot]); }
+    inline bool IsValidSlot(int slot)    { return (slot >= 0 && slot < size); }
     inline int  GetSize()                { return this->size; }
     inline bool IsValidPtr(A* ptr)       { return GetIndex(ptr) != -1; }
     inline bool IsAvailable()            { return this->firstFree >= 0 && this->firstFree < this->size; }
@@ -86,6 +90,7 @@ public:
     }
     inline A* AllocAt(int slot, bool reoccupy = false)
     {
+        if(!this->IsValidSlot(slot)) return NULL;
         if(reoccupy == false && this->occupied[slot] == true) return NULL;
         if(this->firstFree == slot)
         {
@@ -138,7 +143,7 @@ public:
     }
     inline A* AllocAt(int slot, bool reoccupy = false)
     {
-        if(slot < 0 || slot >= this->size) return NULL;
+        if(!this->IsValidSlot(slot)) return NULL;
         if(reoccupy == false && this->occupied[slot] == true) return NULL;
         if(slot > this->highestSlotUsedEver) this->highestSlotUsedEver = slot;
 
@@ -194,6 +199,7 @@ public:
     }
     inline A* AllocAt(int slot, bool reoccupy = false)
     {
+        if(!this->IsValidSlot(slot)) return NULL;
         if(reoccupy == false && this->occupied[slot] == true) return NULL;
         if(slot > this->highestSlotUsedEver) this->highestSlotUsedEver = slot;
         if(this->firstFree == slot)
